@@ -1,0 +1,27 @@
+# docker-compose.yml — one command to run VeilPiercer
+#   docker compose up -d
+#   open http://localhost:9100
+
+version: "3.8"
+
+services:
+  veilpiercer:
+    build: .
+    container_name: veilpiercer
+    ports:
+      - "9100:9100"
+    volumes:
+      - ./stats.json:/app/stats.json
+      - ./training_ledger.json:/app/training_ledger.json
+      - ./reports:/app/reports
+    environment:
+      - PORT=9100
+      - VP_API_PORT=9100
+      - VP_STATS_FILE=/app/stats.json
+      - SIAS_LEDGER=/app/training_ledger.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9100/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
