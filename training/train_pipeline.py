@@ -45,17 +45,18 @@ METRICS = {
 
 def benchmark_contracts(limit=20):
     """Run full pipeline on contracts, collect all metrics."""
-    seen, count = set(), 0
+    count = 0
     start_time = time.time()
+    contest_stats = {}  # per-contest breakdown
     
     for contest in sorted(os.listdir(CONTRACT_DIR), key=lambda x: -int(x) if x.isdigit() else 0):
         cdir = os.path.join(CONTRACT_DIR, contest, 'contracts')
         if not os.path.isdir(cdir): continue
+        contest_findings = 0
+        contest_contracts = 0
         for f in sorted(os.listdir(cdir)):
             fp = os.path.join(cdir, f)
             if not f.endswith('.sol') or os.path.getsize(fp) > 50000: continue
-            if contest in seen: continue
-            seen.add(contest)
             
             t0 = time.time()
             with open(fp) as fh: src = fh.read()
@@ -76,6 +77,8 @@ def benchmark_contracts(limit=20):
             # Findings metrics
             findings = scan_contract(src, f)
             METRICS['total_findings'] += len(findings)
+            contest_findings += len(findings)
+            contest_contracts += 1
             for fi in findings:
                 sev = fi.get('severity', 'low')
                 METRICS['findings_severity'][sev] = METRICS['findings_severity'].get(sev, 0) + 1
@@ -90,6 +93,8 @@ def benchmark_contracts(limit=20):
             METRICS['total_contracts'] += 1
             count += 1
             if count >= limit: break
+        if contest_contracts > 0:
+            contest_stats[contest] = {'contracts': contest_contracts, 'findings': contest_findings}
         if count >= limit: break
     
     METRICS['total_time'] = time.time() - start_time
