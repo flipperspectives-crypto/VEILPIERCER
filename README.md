@@ -114,6 +114,27 @@ Open `http://localhost:9100` and paste any Solidity contract. Or click one of th
 
 See [DEPLOY.md](DEPLOY.md) for full instructions.
 
+### GitHub Action — Auto-audit every PR
+
+Add this one file to any Solidity repo:
+
+**.github/workflows/veilpiercer.yml**
+```yaml
+name: VeilPiercer Audit
+on:
+  pull_request:
+    paths: ['**.sol']
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: flipperspectives-crypto/VEILPIERCER/.github/actions/audit@main
+```
+
+Every PR that touches `.sol` files gets scanned and findings posted as a comment. Free. No API keys.
+
 ## Pricing
 
 | | Cloud AI | VeilPiercer |
