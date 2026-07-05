@@ -17,6 +17,14 @@
 [![Errors](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/errors.json)](https://veilpiercer.fly.dev/dashboard)
 [![Uptime](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/uptime.json)](https://veilpiercer.fly.dev/dashboard)
 
+<br>
+
+#### Smart Contract Audit — v2.2
+
+[![Benchmark](https://img.shields.io/badge/benchmark-225%20contracts-blue)](https://github.com/flipperspectives-crypto/VEILPIERCER/blob/main/docs/benchmark-report-v2.2.md)
+[![Community](https://img.shields.io/badge/community-leaderboard-purple)](https://veilpiercer.fly.dev/community)
+[![Verify](https://img.shields.io/badge/verify-get%20badge-green)](https://veilpiercer.fly.dev/verify)
+
 *Pierce the veil. See everything.*
 
 **One-time purchase. Zero subscriptions. Unlimited intelligence.**
