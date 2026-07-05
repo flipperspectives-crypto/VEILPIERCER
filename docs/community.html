@@ -39,6 +39,11 @@ footer a{color:var(--cyan);text-decoration:none}
 </div>
 
 <div class="card" style="margin-bottom:10px">
+<h3>Recent Community Activity</h3>
+<table><thead><tr><th>When</th><th>Findings</th><th>Top Vulnerability</th></tr></thead><tbody id="recent-activity"></tbody></table>
+</div>
+
+<div class="card" style="margin-bottom:10px">
 <h3>Severity Breakdown</h3>
 <div id="severity-chart"></div>
 </div>
@@ -117,6 +122,14 @@ async function refresh() {
         <span style="font-size:0.7em;color:var(--muted);width:60px;text-align:right">${c} (${pct}%)</span>
       </div>`;
     }).join('') || '<p style="color:var(--muted);font-size:0.75em">No data yet</p>';
+
+    // Recent activity
+    const recent = d.recent_scans || [];
+    document.getElementById('recent-activity').innerHTML = recent.slice(0,8).map(s => {
+      const ago = Math.floor((Date.now()/1000 - s.time) / 60);
+      const agoStr = ago < 1 ? 'just now' : ago < 60 ? ago + 'm ago' : Math.floor(ago/60) + 'h ago';
+      return `<tr><td>${agoStr}</td><td>${s.findings}</td><td>${s.top_vuln}</td></tr>`;
+    }).join('') || '<tr><td colspan="3">No recent scans — be the first!</td></tr>';
 
   } catch(e) {
     document.getElementById('refresh').textContent = 'API offline — retrying...';
