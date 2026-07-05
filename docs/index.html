@@ -54,7 +54,7 @@ tr:hover{background:rgba(255,255,255,.03)}
   <div class="hero">
     <h1>VeilPiercer</h1>
     <p>Paste Solidity code. Get an instant multi-engine audit report with cryptographic proofs.</p>
-    <div class="badges"><span class="badge bg">94/94 Tests</span><span class="badge bb">3 Engines</span><span class="badge bp">MIT</span></div>
+    <div class="badges"><span class="badge bg">94/94 Tests</span><span class="badge bb">3 Engines</span><span class="badge bp">MIT</span><span class="badge" style="background:#1e3a5f;color:#93c5fd" id="scan-counter">Loading...</span></div>
   </div>
 
   <!-- ── Try It Now ────────────────────────────────────────────── -->
@@ -124,7 +124,7 @@ tr:hover{background:rgba(255,255,255,.03)}
   </div>
 
   <div class="footer">
-    <p>VeilPiercer v2.1 &middot; <a href="https://github.com/veilpiercer/veilpiercer">GitHub</a> &middot; <a href="/api">API</a> &middot; <a href="/api/stats">Stats</a> &middot; <a href="/health">Health</a> &middot; <button class="btn btn-small btn-example" onclick="copyReport('markdown')" style="display:inline">Copy Report</button></p>
+    <p>VeilPiercer v2.1 &middot; <a href="https://github.com/flipperspectives-crypto/VEILPIERCER">GitHub</a> &middot; <a href="/api">API</a> &middot; <a href="/api/stats">Stats</a> &middot; <a href="/health">Health</a> &middot; <a href="https://github.com/flipperspectives-crypto/VEILPIERCER/tree/main/reports/public_audits">Audits</a> &middot; <button class="btn btn-small btn-example" onclick="copyReport('markdown')" style="display:inline">Copy Report</button></p>
   </div>
 </div>
 <div class="copy-msg" id="copyMsg">Copied!</div>
@@ -288,6 +288,7 @@ async function fetchStats() {
     const s = await r.json()
     document.getElementById('stats-panel').style.display = 'block'
     document.getElementById('s-total').textContent = s.total_scans.toLocaleString()
+    document.getElementById('scan-counter').textContent = s.total_scans.toLocaleString() + ' scans'
     document.getElementById('s-avgfind').textContent = s.avg_findings
     document.getElementById('s-dep').textContent = s.dep_success_pct + '%'
     document.getElementById('s-dep').style.color = s.dep_success_pct >= 90 ? 'var(--green)' : s.dep_success_pct >= 70 ? 'var(--yellow)' : 'var(--red)'
