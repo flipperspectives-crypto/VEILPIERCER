@@ -120,7 +120,10 @@ tr:hover{background:rgba(255,255,255,.03)}
     </div>
     <div id="summary"></div>
     <div class="table-wrap"><table><thead><tr><th>#</th><th>Severity</th><th>Vulnerability</th><th>Sources</th><th>Action</th></tr></thead><tbody id="findings"></tbody></table></div>
-    <div class="btn-row"><button class="btn btn-copy" onclick="copyReport('markdown')">Copy MD</button><button class="btn btn-copy" onclick="copyReport('json')">Copy JSON</button><button class="btn btn-copy" onclick="copyShareURL()" style="background:var(--purple)">🔗 Share</button></div>
+    <div class="btn-row"><button class="btn btn-copy" onclick="copyReport('markdown')">Copy MD</button><button class="btn btn-copy" onclick="copyReport('json')">Copy JSON</button><button class="btn btn-copy" onclick="copyShareURL()" style="background:var(--purple)">🔗 Share</button><button class="btn btn-copy" onclick="tweetResult()" style="background:#1d9bf0">𝕏 Tweet</button></div>
+    <div style="text-align:center;margin-top:8px;font-size:11px">
+      <a href="https://github.com/flipperspectives-crypto/VEILPIERCER/issues/new?labels=feedback&title=Scan%20Feedback" target="_blank" style="color:var(--muted)">📝 Send feedback</a>
+    </div>
   </div>
 
   <div class="footer">
@@ -210,6 +213,18 @@ function copyShareURL() {
     msg.classList.add('show')
     setTimeout(() => msg.classList.remove('show'), 2000)
   })
+}
+
+function tweetResult() {
+  if (!lastReport) return
+  const sev = lastReport.severity_counts || {}
+  const findings = lastReport.findings?.length || 0
+  const text = encodeURIComponent(
+    `Scanned a contract with VeilPiercer — ${findings} findings (H:${sev.high||0} M:${sev.medium||0} L:${sev.low||0})\n\n` +
+    `Free multi-engine audit: regex + Slither + Mythril\n` +
+    `Try it: https://3924739b617b797e-65-94-86-110.serveousercontent.com`
+  )
+  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank')
 }
 
 // Check for shared code in URL on load
