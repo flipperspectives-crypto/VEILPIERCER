@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeilPiercer — Community Findings</title>
+<style>
+:root{--bg:#0a0a0f;--card:#111118;--border:#1a1a2e;--green:#00ff41;--red:#ff0040;--yellow:#ffcc00;--cyan:#00ccff;--text:#c0c0d0;--muted:#606078;--purple:#7c3aed}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono','Courier New',monospace;padding:16px;min-height:100vh}
+h1{color:var(--cyan);font-size:1.4em;margin-bottom:4px}
+h2{color:var(--text);font-size:0.9em;margin-bottom:16px;font-weight:normal}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px}
+.card h3{font-size:0.7em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.card .value{font-size:1.5em;font-weight:bold}
+.refresh{color:var(--muted);font-size:0.65em;text-align:right;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:0.75em;margin-top:8px}
+th{text-align:left;color:var(--muted);padding:4px 10px;border-bottom:1px solid var(--border)}
+td{padding:4px 10px;border-bottom:1px solid var(--border)}
+tr:hover{background:rgba(0,204,255,0.04)}
+.bar{height:6px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden;min-width:60px}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.5s}
+footer{text-align:center;color:var(--muted);font-size:0.65em;margin-top:24px;padding-top:12px;border-top:1px solid var(--border)}
+footer a{color:var(--cyan);text-decoration:none}
+.opt-in-note{background:rgba(124,58,237,0.1);border:1px solid var(--purple);border-radius:6px;padding:12px;margin:16px 0;font-size:0.75em;color:var(--purple)}
+</style>
+</head>
+<body>
+<h1>VeilPiercer Community</h1>
+<h2>Opt-in Public Leaderboard — Anonymized Aggregate Stats</h2>
+<div class="refresh" id="refresh">Loading...</div>
+
+<div class="grid" id="cards"></div>
+
+<div class="card" style="margin-bottom:10px">
+<h3>Top Vulnerability Types Found</h3>
+<table><thead><tr><th>#</th><th>Vulnerability</th><th>Count</th><th>Share</th></tr></thead><tbody id="top-vulns"></tbody></table>
+</div>
+
+<div class="card" style="margin-bottom:10px">
+<h3>Severity Breakdown</h3>
+<div id="severity-chart"></div>
+</div>
+
+<div class="opt-in-note">
+  <strong>Privacy-first:</strong> Community stats are aggregate only. No code, no addresses, no PII.
+  Scans are only counted when users opt in via the checkbox on the <a href="/" style="color:var(--cyan)">scan page</a>.
+  Your IP is hashed before counting contributors — we can't trace individual scans back to you.
+</div>
+
+<footer>
+  <a href="/">Scan UI</a> · <a href="/dashboard">Dashboard</a> · <a href="/api/community">JSON API</a>
+</footer>
+
+<script>
+const COLORS = ['#00ccff','#7c3aed','#00ff41','#ffcc00','#ff0040','#ff6600','#ff00ff','#00ffcc','#ff8800','#4488ff'];
+
+async function refresh() {
+  try {
+    const r = await fetch('/api/community');
+    const d = await r.json();
+    const now = new Date();
+    document.getElementById('refresh').textContent = `Updated: ${now.toLocaleTimeString()}  |  ${d.contributors || 0} contributors · ${d.total_scans || 0} community scans`;
+
+    // Cards
+    document.getElementById('cards').innerHTML = `
+      <div class="card"><h3>Community Scans</h3><div class="value" style="color:var(--cyan)">${(d.total_scans||0).toLocaleString()}</div></div>
+      <div class="card"><h3>Total Findings</h3><div class="value" style="color:var(--purple)">${(d.total_findings||0).toLocaleString()}</div></div>
+      <div class="card"><h3>Avg Findings/Scan</h3><div class="value" style="color:var(--text)">${d.avg_findings || 0}</div></div>
+      <div class="card"><h3>Contributors</h3><div class="value" style="color:var(--green)">${d.contributors || 0}</div></div>
+    `;
+
+    // Top vulnerabilities
+    const vulns = d.top_vulnerabilities || [];
+    const totalFindings = d.total_findings || 1;
+    document.getElementById('top-vulns').innerHTML = vulns.map(([name, count], i) => {
+      const pct = (count / totalFindings * 100).toFixed(1);
+      const color = COLORS[i % COLORS.length];
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${name}</td>
+        <td>${count}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+            <span style="font-size:0.8em;color:var(--muted)">${pct}%</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="4">No community data yet — be the first to contribute!</td></tr>';
+
+    // Severity chart
+    const sev = d.severity_breakdown || {};
+    const sevColors = {critical:'#ff0040',high:'#ff6600',medium:'#ffcc00',low:'#4488ff',informational:'#606078'};
+    document.getElementById('severity-chart').innerHTML = Object.entries(sev).map(([s,c]) => {
+      const pct = (c / totalFindings * 100).toFixed(1);
+      return `<div style="display:flex;align-items:center;gap:8px;margin:4px 0">
+        <span style="color:${sevColors[s]||'var(--muted)'};width:90px;font-size:0.75em;text-transform:uppercase">${s}</span>
+        <div class="bar" style="flex:1"><div class="bar-fill" style="width:${pct}%;background:${sevColors[s]||'var(--muted)'}"></div></div>
+        <span style="font-size:0.7em;color:var(--muted);width:60px;text-align:right">${c} (${pct}%)</span>
+      </div>`;
+    }).join('') || '<p style="color:var(--muted);font-size:0.75em">No data yet</p>';
+
+  } catch(e) {
+    document.getElementById('refresh').textContent = 'API offline — retrying...';
+  }
+}
+
+refresh();
+setInterval(refresh, 15000);
+</script>
+</body>
+</html>
