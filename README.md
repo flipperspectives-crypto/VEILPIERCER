@@ -4,6 +4,9 @@
 
 ### Autonomous AI Swarm Intelligence — Powered by Your GPU
 
+> **🚀 [LIVE DEMO: Free Smart Contract Audit](https://3924739b617b797e-65-94-86-110.serveousercontent.com) — Try it now**  
+> Paste Solidity → 3 engines scan in <1s → findings + proofs. No API keys.
+
 [![GPU](https://img.shields.io/badge/GPU-CUDA%20Accelerated-00e5ff)](https://developer.nvidia.com/cuda-toolkit)
 [![Cost](https://img.shields.io/badge/Monthly%20Cost-$0-34d399)](https://github.com)
 [![Agents](https://img.shields.io/badge/AI%20Agents-5-a78bfa)](https://github.com)
