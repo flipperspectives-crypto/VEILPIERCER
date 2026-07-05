@@ -98,7 +98,7 @@ python3 web/sias_server.py --port 9100
 
 Open `http://localhost:9100` and paste any Solidity contract. Or click one of the example buttons: Reentrancy, Flash Loan, Missing Auth, Oracle Manipulation.
 
-**[Live Demo](https://veilpiercer.fly.dev)** · **[Deploy Guide](DEPLOY.md)** · **[Community Leaderboard](https://veilpiercer.fly.dev/community)** · **[Get Verified Badge](https://veilpiercer.fly.dev/verify)** · **[Public Audits](reports/public_audits/)** · **[Roadmap](ROADMAP.md)**
+**[Live Demo](https://3924739b617b797e-65-94-86-110.serveousercontent.com)** · **[Deploy Guide](DEPLOY.md)** · **[Community Leaderboard](https://3924739b617b797e-65-94-86-110.serveousercontent.com/community)** · **[Get Verified Badge](https://3924739b617b797e-65-94-86-110.serveousercontent.com/verify)** · **[Public Audits](reports/public_audits/)** · **[Roadmap](ROADMAP.md)**
 
 ### Free Hosting Options
 
