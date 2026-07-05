@@ -8,6 +8,15 @@
 [![Cost](https://img.shields.io/badge/Monthly%20Cost-$0-34d399)](https://github.com)
 [![Agents](https://img.shields.io/badge/AI%20Agents-5-a78bfa)](https://github.com)
 
+<br>
+
+#### Smart Contract Audit Engine — Live Metrics
+
+[![Dep Resolution](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/dep_resolution.json)](https://veilpiercer.fly.dev/dashboard)
+[![Total Scans](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/scans.json)](https://veilpiercer.fly.dev/dashboard)
+[![Errors](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/errors.json)](https://veilpiercer.fly.dev/dashboard)
+[![Uptime](https://img.shields.io/endpoint?url=https://veilpiercer.fly.dev/api/badge/uptime.json)](https://veilpiercer.fly.dev/dashboard)
+
 *Pierce the veil. See everything.*
 
 **One-time purchase. Zero subscriptions. Unlimited intelligence.**
