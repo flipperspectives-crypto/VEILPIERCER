@@ -147,3 +147,7 @@ python3 train_pipeline.py --ci
 - [ ] Confusion matrix row computed from `--full` run (not estimated)
 - [ ] Zero new false positives on the 39-contract corpus (or justified)
 - [ ] `train_pipeline.py --ci` passes (dep resolution ≥ 92%, zero privacy violations)
+
+## Example PR
+
+See [docs/example-pr-tx-origin-auth.md](docs/example-pr-tx-origin-auth.md) for a complete, real example of adding a detection pattern (SWC-115 `tx.origin` auth). It shows the full workflow: original finding → minimal contract → pattern → confusion matrix → hit analysis → CI gate verification. Use it as a template for your own submissions.
