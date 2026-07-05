@@ -1,0 +1,72 @@
+name: Feature Request
+description: Propose a new scanner check, tool integration, or pipeline improvement
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas welcome. VeilPiercer grows from real audit needs — tell us what pattern or workflow would make your audits faster.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New vulnerability pattern / regex rule
+        - New tool integration (e.g. Foundry, Hardhat, Aderyn)
+        - Web dashboard / UI
+        - SIAS chain (proofs, anchoring)
+        - Training pipeline / benchmarking
+        - Documentation / guides
+        - Developer experience / CLI
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this solve? What's missing today?
+      placeholder: |
+        Example: The regex scanner catches basic reentrancy but misses cross-function reentrancy where the external call is in a different function. Real audits need this covered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would this work? Be specific.
+      placeholder: |
+        Example: Add a cross-function reentrancy pattern that checks if any function in the contract makes an external call AND any other function modifies state. Flag with severity HIGH.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example contract (if applicable)
+      description: A minimal Solidity snippet showing the vulnerability this would catch.
+      render: solidity
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you've thought about?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues and discussions
+          required: true
+        - label: This is not already covered by a planned feature
+          required: false
