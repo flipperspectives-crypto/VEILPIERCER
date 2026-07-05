@@ -1,25 +1,31 @@
 #!/bin/bash
 # VeilPiercer — Production Server Start Script
-# Auto-restarts on crash, persists stats to disk
-# Usage: ./start.sh [--port 9100]
-
-set -e
+# Usage: ./start.sh [PORT]
 
 PORT="${1:-9100}"
+[ "$PORT" = "--port" ] && PORT="${2:-9100}"
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 MAX_RESTARTS=10
-RESTART_WINDOW=300  # 5 minutes
+RESTART_WINDOW=300
 RESTART_COUNT=0
 RESTART_START=$(date +%s)
 
 echo "═══ VeilPiercer v2.2 — Production Server ═══"
 echo "  Port:     $PORT"
 echo "  Stats:    $SCRIPT_DIR/../stats.json"
-echo "  Ledger:   $SCRIPT_DIR/../training_ledger.json"
-echo "  Max restarts: $MAX_RESTARTS in ${RESTART_WINDOW}s"
+echo "  Max restarts: $MAX_RESTARTS/${RESTART_WINDOW}s"
 echo ""
 
 cd "$SCRIPT_DIR"
+
+# Kill any old server on this port
+OLD_PID=$(ss -tlnp 2>/dev/null | grep ":$PORT " | grep -oP 'pid=\K\d+' | head -1)
+if [ -n "$OLD_PID" ]; then
+    echo "[$(date '+%H:%M:%S')] Killing old server on port $PORT (pid $OLD_PID)..."
+    kill "$OLD_PID" 2>/dev/null
+    sleep 1
+fi
 
 while true; do
     echo "[$(date '+%H:%M:%S')] Starting server on port $PORT..."
@@ -39,6 +45,6 @@ while true; do
         exit 1
     fi
 
-    echo "[$(date '+%H:%M:%S')] Server exited (code $EXIT_CODE). Restarting in 3s ($RESTART_COUNT/$MAX_RESTARTS)..."
+    echo "[$(date '+%H:%M:%S')] Exited (code $EXIT_CODE). Restart $RESTART_COUNT/$MAX_RESTARTS in 3s..."
     sleep 3
 done
