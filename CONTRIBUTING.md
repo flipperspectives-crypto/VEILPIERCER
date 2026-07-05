@@ -151,3 +151,7 @@ python3 train_pipeline.py --ci
 ## Example PR
 
 See [docs/example-pr-tx-origin-auth.md](docs/example-pr-tx-origin-auth.md) for a complete, real example of adding a detection pattern (SWC-115 `tx.origin` auth). It shows the full workflow: original finding → minimal contract → pattern → confusion matrix → hit analysis → CI gate verification. Use it as a template for your own submissions.
+
+## Where to Start
+
+Check the [ROADMAP.md](ROADMAP.md) for prioritized tasks. Look for items tagged **`good first issue`** — these need ≤2 files changed and follow the pattern-authoring guide above.
