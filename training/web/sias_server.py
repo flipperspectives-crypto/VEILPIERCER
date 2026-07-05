@@ -14,8 +14,15 @@ Usage:
   python3 sias_server.py [--port 9100] [--ledger audit.json]
 """
 
-import sys, os, json, time
+import sys, os, json, time, socket
 from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class ReuseHTTPServer(HTTPServer):
+    """HTTPServer with SO_REUSEADDR for clean restarts."""
+    allow_reuse_address = True
+    def server_bind(self):
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super().server_bind()
 
 # Rate limiting
 _RATE_LIMIT = {}  # {ip: [timestamps]}
@@ -568,7 +575,7 @@ def main():
     print(f"  Ledger:    {LEDGER}")
     _load_stats()
 
-    server = HTTPServer(("0.0.0.0", PORT), Handler)
+    server = ReuseHTTPServer(("0.0.0.0", PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
