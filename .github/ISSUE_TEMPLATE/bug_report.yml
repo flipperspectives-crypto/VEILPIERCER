@@ -1,0 +1,88 @@
+name: Bug Report
+description: Report a scanner bug, false positive, or pipeline failure
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. VeilPiercer's accuracy depends on real-world testing — every report helps.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which component?
+      options:
+        - Regex scanner (bounty_hunter_elite)
+        - Slither integration
+        - Mythril integration
+        - Dependency resolver (dep_resolver)
+        - SIAS audit ledger / chain
+        - Web dashboard (index.html / API)
+        - Training pipeline
+        - CLI (vp_cli.py)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Impact
+      options:
+        - False positive (incorrect finding reported)
+        - False negative (missed real vulnerability)
+        - Crash / traceback
+        - Incorrect severity classification
+        - Performance issue
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly. What did you expect vs what happened?
+      placeholder: |
+        Example: Scanner reported "reentrancy" on a contract that uses ReentrancyGuard from OpenZeppelin.
+        Expected: no reentrancy finding.
+        Actual: HIGH severity reentrancy reported on line 42.
+    validations:
+      required: true
+
+  - type: textarea
+    id: contract
+    attributes:
+      label: Contract code (if applicable)
+      description: Paste the minimal Solidity code that triggers the bug. Keep it short — strip irrelevant functions.
+      render: solidity
+    validations:
+      required: false
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Scanner output
+      description: Paste the relevant CLI output, JSON findings, or traceback.
+      render: json
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: VeilPiercer version
+      placeholder: "2.1.0"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues and didn't find a duplicate
+          required: true
+        - label: I tested with the latest version
+          required: false
