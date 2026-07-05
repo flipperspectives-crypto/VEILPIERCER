@@ -170,14 +170,23 @@ VULN_PATTERNS = {
         ],
         "exploit_chain": "external call before state update - attacker re-enters - drains funds",
     },
-    "access_control": {
+    "uses_access_control": {
         "severity": "informational",
         "patterns": [
-            r'onlyOwner', r'require\(msg\.sender == owner', r'Ownable',
-            r'function\s+\w+\s*\(.*\)\s*(public|external)(?!.*onlyOwner)',
-            r'_msgSender\(\)', r'msg\.sender(?!.*require)',
+            r'onlyOwner', r'Ownable\b', r'AccessControl\b',
+            r'require\s*\(\s*msg\.sender\s*==\s*owner',
+            r'modifier\s+only\w+', r'_checkRole', r'hasRole',
         ],
-        "exploit_chain": "privileged function lacks access control - anyone can call - steals control",
+        "exploit_chain": "contract implements access control patterns — informational, not a vulnerability",
+    },
+    "missing_access_control": {
+        "severity": "high",
+        "patterns": [
+            r'function\s+\w*(?:set|change|update|transfer)\w*(?:Owner|Admin|Govern|Fee|Price)\w*\s*\([^)]*\)\s*(?:public|external)\s*\{',
+            r'selfdestruct\s*\(',
+            r'function\s+\w+\s*\([^)]*\)\s*(?:public|external)\s*\{[^}]*require\s*\(\s*msg\.sender\s*==\s*(?!owner|tx\.origin)',
+        ],
+        "exploit_chain": "privileged state change lacks access control — attacker can set owner/admin/fees — full compromise",
     },
     "arithmetic": {
         "severity": "high",
@@ -191,11 +200,18 @@ VULN_PATTERNS = {
     "flash_loan": {
         "severity": "high",
         "patterns": [
-            r'flashLoan', r'flash_loan', r'FlashLoan',
-            r'getAmountsOut', r'swapExactTokens',
-            r'getReserves\(\)', r'price.*manipulat',
+            # Flash loan callback entry points (strong signal)
+            r'flashLoan', r'FlashLoan', r'flash_loan',
+            r'onFlashLoan\s*\(', r'IERC3156FlashLender',
+            r'executeOperation\s*\(', r'flashSwap',
+            # Price oracle reads (potential manipulation target)
+            r'getReserves\s*\(', r'getAmountsOut\s*\(',
+            r'\.consult\s*\(',
+            # No-slippage/deadline swaps (exploitable)
+            r'amountOutMin\s*=\s*0\b', r'deadline\s*=\s*0\b',
+            r'amountOutMinimum\s*:\s*0',
         ],
-        "exploit_chain": "flash loan - manipulate price oracle - exploit dependent logic - profit",
+        "exploit_chain": "flash loan → manipulate DEX pair price → exploit oracle-dependent logic → repay in same tx → profit from price distortion",
     },
     "frontrunning": {
         "severity": "medium",
@@ -308,7 +324,46 @@ def scan_contract(code, filename="unknown"):
     severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     findings.sort(key=lambda f: severity_order.get(f["severity"], 99))
 
+    # ── Severity recalibration (context-aware) ──────────────────
+    _recalibrate_severity(findings, code)
+
     return findings
+
+
+def _recalibrate_severity(findings, code):
+    """Context-aware severity recalibration.
+    - .transfer() / .send() → downgrade reentrancy (2300 gas limit, not reentrant)
+    - Contract has onlyOwner → downgrade uses_access_control (good pattern, not a bug)
+    - selfdestruct without onlyOwner → keep missing_access_control HIGH
+    """
+    has_onlyowner = 'onlyOwner' in code or 'Ownable' in code
+
+    for f in findings:
+        vuln = f['vulnerability']
+
+        # Downgrade reentrancy on safe patterns
+        if vuln == 'reentrancy':
+            safe_patterns = 0
+            for m in f.get('matches', []):
+                line_code = m.get('code', '')
+                if '.transfer(' in line_code or '.send(' in line_code:
+                    safe_patterns += 1
+            # If ALL matches are .transfer/.send, downgrade
+            if safe_patterns > 0 and safe_patterns == len(f.get('matches', [])):
+                f['severity'] = 'informational'
+                f['exploit_chain'] += ' (safe: .transfer/.send have 2300 gas limit)'
+
+        # Downgrade uses_access_control when contract properly implements it
+        if vuln == 'uses_access_control' and has_onlyowner:
+            # Contract has proper access control — this is informational at most
+            f['severity'] = 'informational'
+
+        # Upgrade selfdestruct findings
+        if vuln == 'missing_access_control':
+            for m in f.get('matches', []):
+                if 'selfdestruct' in m.get('code', ''):
+                    f['severity'] = 'critical'
+                    f['exploit_chain'] = 'unprotected selfdestruct — attacker can destroy contract — CRITICAL'
 
 
 _api_calls = 0
