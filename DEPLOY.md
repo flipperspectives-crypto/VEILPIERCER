@@ -65,6 +65,16 @@ ngrok http 9100
 
 Free tier gives temporary URLs with rate limiting.
 
+## Option 6: serveo.net (no install, SSH tunnel)
+
+```bash
+# Start server, then:
+ssh -R 80:localhost:9100 serveo.net
+# Output: https://xxxx.serveousercontent.com
+```
+
+Zero install. Works from any machine with SSH. No account needed.
+
 ## Verify
 
 ```bash
