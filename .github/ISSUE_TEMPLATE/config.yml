@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: VeilPiercer Documentation
+    url: https://github.com/flipperspectives-crypto/VEILPIERCER#readme
+    about: Read the docs before filing an issue.
+  - name: GitHub Discussions
+    url: https://github.com/flipperspectives-crypto/VEILPIERCER/discussions
+    about: Ask questions, share ideas, or discuss usage here.
