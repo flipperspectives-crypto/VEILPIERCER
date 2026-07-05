@@ -82,6 +82,17 @@ python cosmos_server.py
 
 Open `http://localhost:9100` — done.
 
+## Smart Contract Audit — Try It Now
+
+```bash
+# One command — no install, no API keys
+curl -sL https://raw.githubusercontent.com/flipperspectives-crypto/VEILPIERCER/main/training/web/start.sh | bash
+```
+
+Open `http://localhost:9100` and paste any Solidity contract. Or click one of the example buttons: Reentrancy, Flash Loan, Missing Auth, Oracle Manipulation.
+
+**[Live Demo](https://veilpiercer.fly.dev)** · **[Community Leaderboard](https://veilpiercer.fly.dev/community)** · **[Get Verified Badge](https://veilpiercer.fly.dev/verify)** · **[Public Audits](reports/public_audits/)** · **[Roadmap](ROADMAP.md)**
+
 ## Pricing
 
 | | Cloud AI | VeilPiercer |
