@@ -233,6 +233,16 @@ VULN_PATTERNS = {
         ],
         "exploit_chain": "integer division truncation - accumulated rounding errors - fund loss over time",
     },
+    "tx_origin_auth": {
+        "severity": "high",
+        "patterns": [
+            r'tx\.origin\s*==',
+            r'require\s*\(\s*tx\.origin',
+            r'==\s*tx\.origin',
+            r'tx\.origin\s*!=\s*address\(0\)',
+        ],
+        "exploit_chain": "tx.origin used for auth — phishing contract proxies user call — bypasses access control — SWC-115",
+    },
 }
 
 
