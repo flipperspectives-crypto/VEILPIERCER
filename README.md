@@ -85,13 +85,31 @@ Open `http://localhost:9100` — done.
 ## Smart Contract Audit — Try It Now
 
 ```bash
-# One command — no install, no API keys
-curl -sL https://raw.githubusercontent.com/flipperspectives-crypto/VEILPIERCER/main/training/web/start.sh | bash
+# One command — Docker (recommended)
+docker run -p 9100:9100 -d ghcr.io/flipperspectives-crypto/veilpiercer:latest
+
+# Or clone and run
+git clone https://github.com/flipperspectives-crypto/VEILPIERCER
+cd VEILPIERCER && docker compose up -d
+
+# Or no Docker — just Python
+python3 web/sias_server.py --port 9100
 ```
 
 Open `http://localhost:9100` and paste any Solidity contract. Or click one of the example buttons: Reentrancy, Flash Loan, Missing Auth, Oracle Manipulation.
 
-**[Live Demo](https://veilpiercer.fly.dev)** · **[Community Leaderboard](https://veilpiercer.fly.dev/community)** · **[Get Verified Badge](https://veilpiercer.fly.dev/verify)** · **[Public Audits](reports/public_audits/)** · **[Roadmap](ROADMAP.md)**
+**[Live Demo](https://veilpiercer.fly.dev)** · **[Deploy Guide](DEPLOY.md)** · **[Community Leaderboard](https://veilpiercer.fly.dev/community)** · **[Get Verified Badge](https://veilpiercer.fly.dev/verify)** · **[Public Audits](reports/public_audits/)** · **[Roadmap](ROADMAP.md)**
+
+### Free Hosting Options
+
+| Platform | Command | Cost |
+|----------|---------|------|
+| Fly.io | `fly deploy` | Free tier |
+| Railway | `railway up` | Free tier |
+| Docker | `docker compose up -d` | Your machine |
+| Cloudflared | `cloudflared tunnel --url :9100` | Free |
+
+See [DEPLOY.md](DEPLOY.md) for full instructions.
 
 ## Pricing
 
