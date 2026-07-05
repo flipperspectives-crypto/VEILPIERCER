@@ -145,6 +145,7 @@ def _community_snapshot():
             _COMMUNITY['vuln_counts'].items(), key=lambda x: -x[1]
         )[:10],
         'severity_breakdown': dict(_COMMUNITY['severity_counts']),
+        'recent_scans': list(reversed(_COMMUNITY.get('recent_scans', [])))[:10],
         'uptime_seconds': int(time.time() - _COMMUNITY['started_at']),
     }
 
@@ -153,11 +154,22 @@ def _record_community_scan(findings):
     import hashlib
     _COMMUNITY['total_scans'] += 1
     _COMMUNITY['total_findings'] += len(findings)
+    # Build per-scan summary for recent activity
+    vulns = {}
     for f in findings:
         vuln = f.get('vulnerability', 'unknown')
         sev = f.get('severity', 'low')
         _COMMUNITY['vuln_counts'][vuln] = _COMMUNITY['vuln_counts'].get(vuln, 0) + 1
         _COMMUNITY['severity_counts'][sev] = _COMMUNITY['severity_counts'].get(sev, 0) + 1
+        vulns[vuln] = vulns.get(vuln, 0) + 1
+    top_vuln = max(vulns, key=vulns.get) if vulns else 'none'
+    _COMMUNITY.setdefault('recent_scans', []).append({
+        'time': time.time(),
+        'findings': len(findings),
+        'top_vuln': top_vuln,
+    })
+    if len(_COMMUNITY['recent_scans']) > 20:
+        _COMMUNITY['recent_scans'] = _COMMUNITY['recent_scans'][-20:]
 
 # ── VeilPiercer Verified badge system ─────────────────────────
 _VERIFIED = {}  # {contract_hash: {findings, severity_counts, timestamp, passed}}
