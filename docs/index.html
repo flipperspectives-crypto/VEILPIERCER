@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="VeilPiercer — Instant smart contract audit. Paste code, get multi-engine analysis with cryptographic proofs.">
+<title>VeilPiercer — Smart Contract Audit</title>
+<style>
+:root{--bg:#0a0a0f;--card:#1a1a2e;--text:#e0e0e0;--muted:#888;--border:#333;--accent:#00ccff;--purple:#7c3aed;--red:#dc2626;--orange:#ea580c;--gold:#ca8a04;--blue:#2563eb;--green:#10b981}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:800px;margin:0 auto;padding:20px}
+.hero{text-align:center;padding:40px 0 20px}
+.hero h1{font-size:clamp(2em,5vw,3em);background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:clamp(0.9em,2vw,1.1em);color:var(--muted);margin:12px 0}
+.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:#065f46;color:#6ee7b7}.bb{background:#1e3a5f;color:#93c5fd}.bp{background:#3b0764;color:#c084fc}
+textarea{width:100%;min-height:180px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.5;resize:vertical;transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--accent)}
+.btn-row{display:flex;gap:10px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+.btn{padding:10px 22px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;color:#fff}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--purple))}
+.btn-deep{background:linear-gradient(135deg,var(--purple),var(--accent))}
+.btn-example{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.btn-small{padding:6px 14px;font-size:12px;border-radius:6px}
+.btn-copy{background:var(--green);padding:4px 10px;font-size:11px}
+.btn:hover{opacity:.9}
+.loading{display:none;text-align:center;padding:20px;color:var(--muted)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{display:none;background:#3b0764;border:1px solid var(--purple);border-radius:8px;padding:16px;margin:16px 0;color:#c084fc}
+.result{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;display:none}
+.result h3{margin-bottom:12px;color:var(--accent)}
+.summary-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;min-width:500px}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;white-space:nowrap}
+th{background:rgba(255,255,255,.05);color:var(--muted);font-weight:600}
+tr:hover{background:rgba(255,255,255,.03)}
+.sev{padding:2px 8px;border-radius:4px;color:#fff;font-size:11px;font-weight:700}
+.sc{background:var(--red)}.sh{background:var(--orange)}.sm{background:var(--gold)}.sl{background:var(--blue)}.si{background:#6b7280}
+.critical{border-left:3px solid var(--red)}.high{border-left:3px solid var(--orange)}.medium{border-left:3px solid var(--gold)}
+.footer{text-align:center;color:var(--muted);padding:30px 0;font-size:13px}
+.footer a{color:var(--accent);text-decoration:none}
+.copy-msg{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none}
+.copy-msg.show{opacity:1}
+@media(max-width:600px){.container{padding:12px}.hero{padding:24px 0 12px}textarea{min-height:140px;font-size:12px}.btn{padding:8px 16px;font-size:13px}th,td{font-size:12px;padding:6px 8px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <h1>VeilPiercer</h1>
+    <p>Paste Solidity code. Get an instant multi-engine audit report with cryptographic proofs.</p>
+    <div class="badges"><span class="badge bg">94/94 Tests</span><span class="badge bb">3 Engines</span><span class="badge bp">MIT</span></div>
+  </div>
+
+  <!-- ── Try It Now ────────────────────────────────────────────── -->
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0">
+      <button class="btn btn-example" onclick="loadPopular('reentrancy')" style="font-size:12px">🔁 Reentrancy</button>
+      <button class="btn btn-example" onclick="loadPopular('flashloan')" style="font-size:12px">⚡ Flash Loan</button>
+      <button class="btn btn-example" onclick="loadPopular('access')" style="font-size:12px">🔐 Missing Auth</button>
+      <button class="btn btn-example" onclick="loadPopular('oracle')" style="font-size:12px">📊 Oracle Manipulation</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin:4px 0">
+      Or paste any Solidity code below →
+      <a href="/community" style="color:var(--purple)">Community</a> ·
+      <a href="/verify" style="color:var(--green)">Get Verified Badge</a>
+    </p>
+  </div>
+
+  <!-- ── Live Monitoring Panel ────────────────────────────────────── -->
+  <div id="stats-panel" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h3 style="margin:0;color:var(--accent);font-size:14px">Live Usage &bullet; <span id="stats-live" style="color:var(--green);font-size:11px">● LIVE</span></h3>
+      <span id="stats-updated" style="color:var(--muted);font-size:11px"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <div><span style="color:var(--muted);font-size:11px">Total Scans</span><br><span id="s-total" style="font-size:1.3em;font-weight:bold;color:var(--cyan)">0</span></div>
+      <div><span style="color:var(--muted);font-size:11px">Avg Findings</span><br><span id="s-avgfind" style="font-size:1.3em;font-weight:bold;color:var(--text)">0</span></div>
+      <div><span style="color:var(--muted);font-size:11px">Dep Success</span><br><span id="s-dep" style="font-size:1.3em;font-weight:bold;color:var(--green)">0%</span></div>
+      <div><span style="color:var(--muted);font-size:11px">Avg Scan Time</span><br><span id="s-avgtime" style="font-size:1.3em;font-weight:bold;color:var(--text)">0ms</span></div>
+      <div><span style="color:var(--muted);font-size:11px">Errors</span><br><span id="s-errors" style="font-size:1.3em;font-weight:bold;color:var(--red)">0</span></div>
+      <div><span style="color:var(--muted);font-size:11px">Uptime</span><br><span id="s-uptime" style="font-size:1.3em;font-weight:bold;color:var(--text)">0s</span></div>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--muted)">
+      Scanner breakdown: <span id="s-scanners"></span>
+    </div>
+  </div>
+
+  <textarea id="code" placeholder="pragma solidity ^0.8.0;&#10;&#10;contract Vulnerable {&#10;    mapping(address => uint) balances;&#10;&#10;    function withdraw(uint amount) external {&#10;        require(balances[msg.sender] >= amount);&#10;        (bool ok,) = msg.sender.call{value: amount}("");&#10;        balances[msg.sender] -= amount;&#10;    }&#10;}" spellcheck="false"></textarea>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="runScan(false)">Quick Scan</button>
+    <button class="btn btn-deep" onclick="runScan(true)">Deep Audit</button>
+  </div>
+  <div style="text-align:center;margin:4px 0">
+    <label style="font-size:11px;color:var(--muted);cursor:pointer">
+      <input type="checkbox" id="communityOptIn" style="vertical-align:middle;margin-right:4px">
+      Contribute anonymized stats to <a href="/community" style="color:var(--cyan)">Community Findings</a> (no code shared)
+    </label>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-example" onclick="loadExample('vuln')">Reentrancy</button>
+    <button class="btn btn-example" onclick="loadExample('oz')">OZ ERC20</button>
+    <button class="btn btn-example" onclick="loadExample('flash')">Flash Loan</button>
+    <button class="btn btn-example" onclick="loadExample('overflow')">Overflow</button>
+  </div>
+
+  <div class="loading" id="loading"><span class="spinner"></span><span id="loadingText">Analyzing with 3 engines...</span></div>
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <h3>Audit Results</h3>
+      <span id="timer" style="color:var(--muted);font-size:12px"></span>
+    </div>
+    <div id="summary"></div>
+    <div class="table-wrap"><table><thead><tr><th>#</th><th>Severity</th><th>Vulnerability</th><th>Sources</th><th>Action</th></tr></thead><tbody id="findings"></tbody></table></div>
+    <div class="btn-row"><button class="btn btn-copy" onclick="copyReport('markdown')">Copy MD</button><button class="btn btn-copy" onclick="copyReport('json')">Copy JSON</button><button class="btn btn-copy" onclick="copyShareURL()" style="background:var(--purple)">🔗 Share</button></div>
+  </div>
+
+  <div class="footer">
+    <p>VeilPiercer v2.1 &middot; <a href="https://github.com/veilpiercer/veilpiercer">GitHub</a> &middot; <a href="/api">API</a> &middot; <a href="/api/stats">Stats</a> &middot; <a href="/health">Health</a> &middot; <button class="btn btn-small btn-example" onclick="copyReport('markdown')" style="display:inline">Copy Report</button></p>
+  </div>
+</div>
+<div class="copy-msg" id="copyMsg">Copied!</div>
+
+<script>
+const examples = {
+  vuln: 'pragma solidity ^0.8.0;\ncontract Vuln {\n    mapping(address=>uint) b;\n    function w(uint a) external {\n        require(b[msg.sender]>=a);\n        (bool ok,)=msg.sender.call{value:a}("");\n        b[msg.sender]-=a;\n    }\n}',
+  oz: '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\nimport "@openzeppelin/contracts/token/ERC20/ERC20.sol";\ncontract MyToken is ERC20 {\n    constructor() ERC20("MyToken","MTK") { _mint(msg.sender, 1000e18); }\n}',
+  flash: 'pragma solidity ^0.8.0;\ncontract FlashLoanVuln {\n    function flashLoan(uint amount, address token, bytes calldata data) external {\n        uint balanceBefore = IERC20(token).balanceOf(address(this));\n        IERC20(token).transfer(msg.sender, amount);\n        (bool ok,) = msg.sender.call(data);\n        require(IERC20(token).balanceOf(address(this)) >= balanceBefore, "not repaid");\n    }\n}\ninterface IERC20 { function transfer(address,uint) external; function balanceOf(address) external view returns(uint); }',
+  overflow: 'pragma solidity ^0.6.0;\ncontract Overflow {\n    mapping(address => uint256) public balanceOf;\n    function transfer(address to, uint256 amount) external {\n        require(balanceOf[msg.sender] >= amount, "insufficient");\n        balanceOf[msg.sender] -= amount;\n        balanceOf[to] += amount;\n    }\n    function batchTransfer(address[] calldata to, uint256[] calldata amounts) external {\n        for (uint i = 0; i < to.length; i++) {\n            transfer(to[i], amounts[i]);\n        }\n    }\n}'
+}
+function loadExample(key) { document.getElementById('code').value = examples[key] }
+
+let lastReport = null, startTime = 0, lastScanCode = ''
+
+// ── Popular contract examples ──────────────────────────────────
+const popularContracts = {
+  reentrancy: `pragma solidity ^0.8.0;
+contract ReentrancyVuln {
+    mapping(address => uint) balances;
+    function withdraw() external {
+        uint amount = balances[msg.sender];
+        (bool ok,) = msg.sender.call{value: amount}("");
+        require(ok);
+        balances[msg.sender] = 0; // ❌ state update AFTER external call
+    }
+}`,
+  flashloan: `pragma solidity ^0.8.0;
+contract FlashLoanVuln {
+    function swap(address token, uint amount) external {
+        uint price = IUniswapV2Pair(token).getReserves();
+        // ❌ price manipulated via flash loan before this call
+        uint output = amount * price / 1e18;
+        IERC20(token).transfer(msg.sender, output);
+    }
+}
+interface IUniswapV2Pair { function getReserves() external view returns (uint); }
+interface IERC20 { function transfer(address,uint) external; }`,
+  access: `pragma solidity ^0.8.0;
+contract MissingAccessControl {
+    address public owner;
+    uint public fee = 100;
+    function setFee(uint _fee) external {
+        fee = _fee; // ❌ no onlyOwner — anyone can change fees
+    }
+    function withdraw() external {
+        payable(msg.sender).transfer(address(this).balance); // ❌ anyone can drain
+    }
+}`,
+  oracle: `pragma solidity ^0.8.0;
+contract OracleVuln {
+    IUniswapV2Pair public pair;
+    function getPrice() external view returns (uint) {
+        (uint r0, uint r1,) = pair.getReserves();
+        return r0 * 1e18 / r1; // ❌ spot price, manipulatable
+    }
+    function swap(uint amountIn, uint minOut) external {
+        uint price = getPrice();
+        uint amountOut = amountIn * price / 1e18;
+        require(amountOut >= minOut, "slippage"); // ⚠️ minOut=0 → no protection
+    }
+}
+interface IUniswapV2Pair { function getReserves() external view returns (uint,uint,uint); }`,
+}
+
+function loadPopular(key) {
+  document.getElementById('code').value = popularContracts[key] || ''
+}
+
+// ── Shareable report ───────────────────────────────────────────
+function getShareURL() {
+  if (!lastScanCode) return null
+  const encoded = btoa(unescape(encodeURIComponent(lastScanCode)))
+  return window.location.origin + '/?code=' + encoded
+}
+
+function copyShareURL() {
+  const url = getShareURL()
+  if (!url) return
+  navigator.clipboard.writeText(url).then(() => {
+    const msg = document.getElementById('copyMsg')
+    msg.textContent = 'Report link copied!'
+    msg.classList.add('show')
+    setTimeout(() => msg.classList.remove('show'), 2000)
+  })
+}
+
+// Check for shared code in URL on load
+(function() {
+  const params = new URLSearchParams(window.location.search)
+  const encoded = params.get('code')
+  if (encoded) {
+    try {
+      const code = decodeURIComponent(escape(atob(encoded)))
+      document.getElementById('code').value = code
+    } catch(e) {}
+  }
+})()
+
+async function runScan(deep) {
+  const code = document.getElementById('code').value.trim()
+  if (!code) return showError('Paste Solidity code first')
+  
+  hideResult(); document.getElementById('error').style.display = 'none'
+  document.getElementById('loading').style.display = 'block'
+  document.getElementById('loadingText').textContent = deep ? 'Deep audit (Slither + Mythril + Judge)...' : 'Scanning with regex + Slither...'
+  startTime = Date.now()
+  
+  try {
+    lastScanCode = code
+    const resp = await fetch('/scan', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,deep,community:document.getElementById('communityOptIn').checked})})
+    const data = await resp.json()
+    if (data.error) { showError(data.error); return }
+    lastReport = data
+    renderResults(data)
+    fetchStats()  // refresh monitoring after scan
+  } catch(e) {
+    showError('Scan failed: ' + e.message + '. Is the server running? Try: docker compose up -d')
+  }
+  document.getElementById('loading').style.display = 'none'
+}
+
+function renderResults(data) {
+  const sev = data.severity_counts || {}
+  document.getElementById('timer').textContent = ((Date.now()-startTime)/1000).toFixed(1) + 's'
+  document.getElementById('summary').innerHTML = 
+    '<div class="summary-row"><strong>' + data.findings.length + ' findings</strong>' +
+    (sev.critical?' <span class="sev sc">'+sev.critical+'</span>':'') +
+    (sev.high?' <span class="sev sh">'+sev.high+'</span>':'') +
+    (sev.medium?' <span class="sev sm">'+sev.medium+'</span>':'') +
+    (sev.low?' <span class="sev sl">'+sev.low+'</span>':'') +
+    ' &nbsp;regex(' + data.scanner_stats.regex + ') slither(' + data.scanner_stats.slither + ') mythril(' + data.scanner_stats.mythril + ')</div>'
+  
+  let rows = ''
+  data.findings.forEach((f,i) => {
+    const cls = {critical:'sc',high:'sh',medium:'sm',low:'sl',informational:'si'}[f.severity]||'si'
+    rows += '<tr class="' + f.severity + '"><td>' + (i+1) + '</td>' +
+      '<td><span class="sev ' + cls + '">' + f.severity.toUpperCase() + '</span></td>' +
+      '<td>' + f.vulnerability + '</td><td>' + (f.sources||['?']).join(', ') + '</td>' +
+      '<td>' + (f.matches?.[0]?.line ? 'L'+f.matches[0].line : '') + '</td></tr>'
+  })
+  document.getElementById('findings').innerHTML = rows || '<tr><td colspan="5">No findings — contract appears clean</td></tr>'
+  document.getElementById('result').style.display = 'block'
+}
+
+function copyReport(fmt) {
+  if (!lastReport) return
+  let text = fmt === 'json' ? JSON.stringify(lastReport, null, 2) : lastReport.markdown || ''
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copyMsg')
+    msg.classList.add('show')
+    setTimeout(() => msg.classList.remove('show'), 2000)
+  })
+}
+
+// ── Live monitoring stats ────────────────────────────────────────────
+async function fetchStats() {
+  try {
+    const r = await fetch('/api/stats')
+    if (!r.ok) return
+    const s = await r.json()
+    document.getElementById('stats-panel').style.display = 'block'
+    document.getElementById('s-total').textContent = s.total_scans.toLocaleString()
+    document.getElementById('s-avgfind').textContent = s.avg_findings
+    document.getElementById('s-dep').textContent = s.dep_success_pct + '%'
+    document.getElementById('s-dep').style.color = s.dep_success_pct >= 90 ? 'var(--green)' : s.dep_success_pct >= 70 ? 'var(--yellow)' : 'var(--red)'
+    document.getElementById('s-avgtime').textContent = s.avg_scan_ms + 'ms'
+    document.getElementById('s-errors').textContent = s.error_count
+    document.getElementById('s-errors').style.color = s.error_count > 0 ? 'var(--red)' : 'var(--green)'
+    document.getElementById('s-uptime').textContent = formatUptime(s.uptime_seconds)
+    const sf = s.scanner_findings || {}
+    document.getElementById('s-scanners').textContent = 'regex ' + (sf.regex || 0) + ' · slither ' + (sf.slither || 0) + ' · mythril ' + (sf.mythril || 0)
+    document.getElementById('stats-updated').textContent = new Date().toLocaleTimeString()
+  } catch(e) {}
+}
+
+function formatUptime(s) {
+  if (s < 60) return s + 's'
+  if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's'
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60)
+  return h + 'h ' + m + 'm'
+}
+
+function showError(msg) {
+  document.getElementById('loading').style.display = 'none'
+  const el = document.getElementById('error')
+  el.textContent = msg; el.style.display = 'block'
+}
+function hideResult() { document.getElementById('result').style.display = 'none' }
+
+// Auto-refresh stats
+fetchStats()
+setInterval(fetchStats, 15000)
+</script>
+</body>
+</html>
