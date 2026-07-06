@@ -42,18 +42,22 @@ jobs:
           m = re.search(r'--- JSON SUMMARY ---\n(.*?)$', text, re.DOTALL)
           if m:
               data = json.loads(m.group(1))
-              with open('/tmp/summary.json', 'w') as f:
-                  json.dump(data, f, indent=2)
-              print('summary_extracted=true')
+              with open('/tmp/summary.json', 'w') as fh:
+                  json.dump(data, fh, indent=2)
+              with open('/tmp/extract_flag.txt', 'w') as fh:
+                  fh.write('true')
           else:
-              print('summary_extracted=false')
-          " >> $GITHUB_OUTPUT
+              with open('/tmp/extract_flag.txt', 'w') as fh:
+                  fh.write('false')
+          "
+          echo "summary_extracted=$(cat /tmp/extract_flag.txt)" >> $GITHUB_OUTPUT
 
       - name: Build discussion body
         id: body
         if: steps.summary.outputs.summary_extracted == 'true'
         run: |
-          python3 .github/scripts/build_discussion_body.py >> $GITHUB_OUTPUT
+          python3 .github/scripts/build_discussion_body.py
+          echo "body_built=true" >> $GITHUB_OUTPUT
 
       - name: Post to GitHub Discussions
         if: steps.summary.outputs.summary_extracted == 'true'
@@ -95,7 +99,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          tail -80 /tmp/training_output.txt > /tmp/fallback_body.txt
           gh issue create \
             --title "Weekly Training Report — $(date +%Y-%m-%d)" \
-            --body "$(tail -80 /tmp/training_output.txt)" \
+            --body-file /tmp/fallback_body.txt \
             --label "training"
