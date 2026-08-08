@@ -1,3 +1,5 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤%20flipperspectives-2ecc71)](https://github.com/sponsors/flipperspectives-crypto)
+
 <div align="center">
 
 # 🔮 VEILPIERCER
